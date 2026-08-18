@@ -6,6 +6,10 @@ see live rollups across farms.
 
 Built in React with a Supabase (Postgres) backend.
 
+**[Try the live demo →](https://austinrowe.github.io/flocklog-demo/)** — the real
+UI running on invented data. Pick any name, enter any four digits. Nothing there
+touches a real database. See [Demo mode](#demo-mode) for how it works.
+
 ---
 
 ## Quick start
