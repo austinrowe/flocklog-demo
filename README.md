@@ -26,10 +26,44 @@ Other commands:
 | `npm run dev` | Local dev server with hot reload |
 | `npm run build` | Production build into `dist/` |
 | `npm run preview` | Serve the production build locally |
+| `npm run demo` | Dev server in demo mode — fake data, no backend |
+| `npm run build:demo` | Production build in demo mode |
 
 There is **no `.env` file to set up.** The Supabase URL and publishable key are
 committed at the top of `src/App.jsx` — see [Security](#security) below for why
 that is intentional.
+
+---
+
+## Demo mode
+
+Demo mode runs the real UI and the real application logic against invented,
+in-memory data. Nothing reaches the network, and no real record is involved. It
+exists so the app can be shown to people without handing out credentials to the
+live database.
+
+Two ways to turn it on:
+
+- `npm run demo` — dev server with demo mode baked in
+- add `?demo` to the URL of any build, e.g. `http://localhost:5173/?demo`
+
+In demo mode **any four-digit PIN signs you in** as whichever name you pick. The
+sign-in screen says so, and a `DEMO — sample data` badge stays pinned to the
+corner of the screen so a screenshot can never be mistaken for production.
+
+The implementation is `src/demoBackend.js`. It exports an object with the same
+shape as the Supabase client — `.from(table)` returning a chainable query
+builder, plus `.auth` and `.functions.invoke` — so `App.jsx` cannot tell the
+difference and needed only a one-line change to accept it. It supports the
+subset of PostgREST the app actually uses: `select` / `insert` / `update` /
+`upsert` / `delete`, `.eq()` filters, `.order()`, `.single()`, and the one
+embedded relation (`profiles(name)`). Writes work and persist for the session,
+so the whole logging flow is explorable.
+
+Data is generated at load time from a fixed seed rather than checked in, which
+keeps the bundle small and the dates current: 3 farms, 24 barns, 9 staff, and
+roughly 2,600 mortality records over the last 60 days, with two barns
+deliberately spiking so the alert logic has something to catch.
 
 ---
 
@@ -71,9 +105,11 @@ district to the all-farms view.
 
 ```
 index.html         Vite host page — fonts, dark background, #root
-vite.config.js     Vite + React plugin (no custom config)
+vite.config.js     Vite + React plugin
+.env.demo          Sets VITE_DEMO=1 for demo mode (no secrets)
 src/main.jsx       React entry point, mounts <App/>
 src/App.jsx        The entire application (~3000 lines)
+src/demoBackend.js Fake in-memory Supabase stand-in for demo mode
 ```
 
 `src/App.jsx` is one large file rather than a component tree across many files.

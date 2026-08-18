@@ -1,11 +1,16 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import { createClient } from "@supabase/supabase-js";
+import { DEMO, createDemoClient } from "./demoBackend.js";
 
 // Real backend. Anon/publishable key is meant to be public — it can only do
 // what the database's Row-Level Security policies allow it to do.
 const SUPABASE_URL = "https://xbolgiibpcabwfzrkvbn.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_nSI4lWciatWSBodGgMSLYw_Z6Y2vrye";
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// In demo mode every call below is served from invented in-memory data and
+// nothing leaves the browser. See demoBackend.js.
+const supabase = DEMO
+  ? createDemoClient()
+  : createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // Same slug rule the server (provision-account Edge Function) uses to build
 // each account's real, hidden login email from its display name + farm.
@@ -1142,6 +1147,17 @@ export default function App() {
   }
   return (
     <div style={{ minHeight: "100vh", background: C.bg, color: C.text, fontFamily: font.body }}>
+      {/* Standing reminder that nothing on screen is real, so a screenshot of
+          the demo can never be mistaken for production data. */}
+      {DEMO && (
+        <div style={{ position: "fixed", left: 10, bottom: 10, zIndex: 90,
+          background: "rgba(255,176,32,0.14)", border: "1px solid rgba(255,176,32,0.5)",
+          color: "#FFB020", borderRadius: 999, padding: "4px 11px",
+          fontFamily: font.mono, fontSize: 11, letterSpacing: 0.4,
+          pointerEvents: "none" }}>
+          DEMO — sample data
+        </div>
+      )}
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap');
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -1274,6 +1290,14 @@ export default function App() {
           ) : (
             <>
               <Eyebrow>{tr("pinFor")} {picked.name}</Eyebrow>
+              {/* No real PIN exists in demo mode, so say so rather than
+                  letting someone stall on a login screen. */}
+              {DEMO && (
+                <div style={{ color: "#FFB020", fontSize: 12.5, textAlign: "center",
+                  fontFamily: font.mono, paddingTop: 8 }}>
+                  {T("Demo — enter any 4 digits", "Demo — ingresa 4 dígitos cualquiera")}
+                </div>
+              )}
               <div style={{ fontFamily: font.mono, fontSize: 34, textAlign: "center",
                 letterSpacing: "0.5em", padding: "10px 0 20px", minHeight: 66 }}>
                 {"●".repeat(pin.length)}
