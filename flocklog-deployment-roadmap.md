@@ -1,5 +1,12 @@
 # FlockLog — Path to Real Barn Deployment
 
+> **Status note (added later):** this roadmap was written *before* the Supabase
+> backend was built, and the "Where this stands today" section below is now out
+> of date — it describes the app when everything lived in React state. Phases 1
+> and 2 have since been substantially implemented: there is a real Supabase
+> project, real auth, and 13 live tables. See `README.md` for current state.
+> Phases 0 and 3–6 remain open. The rest of this document still stands.
+
 ## Where this stands today
 
 `flocklog.jsx` is a fully client-side demo. Every piece of data — mortality entries, weights, tasks, population counts, barn configs, even accounts — lives in React `useState` and is seeded on page load by `seed*()` functions. There is no backend call anywhere in the file. Sign-in accepts any 4-digit PIN for any listed name — it's a role selector, not authentication.
