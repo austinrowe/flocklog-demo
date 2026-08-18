@@ -4,7 +4,9 @@ name: Deploy demo to GitHub Pages
 
 on:
   push:
-    branches: [master]
+    # The github-pages environment's branch policy only permits deploys from
+    # main, so the deploy job is rejected outright on any other branch.
+    branches: [main, master]
   workflow_dispatch:
 
 permissions:
